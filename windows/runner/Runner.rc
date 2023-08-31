@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.abnerjs.sigam" "\0"
-            VALUE "FileDescription", "sigam" "\0"
+            VALUE "CompanyName", "com.abnerjs.imc" "\0"
+            VALUE "FileDescription", "imc" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "sigam" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 com.abnerjs.sigam. All rights reserved." "\0"
-            VALUE "OriginalFilename", "sigam.exe" "\0"
-            VALUE "ProductName", "sigam" "\0"
+            VALUE "InternalName", "imc" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2023 com.abnerjs.imc. All rights reserved." "\0"
+            VALUE "OriginalFilename", "imc.exe" "\0"
+            VALUE "ProductName", "imc" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

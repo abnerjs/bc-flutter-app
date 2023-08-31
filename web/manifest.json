@@ -1,6 +1,6 @@
 {
-    "name": "sigam",
-    "short_name": "sigam",
+    "name": "imc",
+    "short_name": "imc",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
