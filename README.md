@@ -8,3 +8,4 @@ Um projeto simples de calculadora de IMC feito em Dart. A ideia é que o usuári
 - O email e senha para login são `admin` e `admin`
 
 ## Screenshots
+<img src="/assets/imc.png" alt="login" style="width:200px;"/>
