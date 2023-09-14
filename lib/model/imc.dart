@@ -1,14 +1,21 @@
 // ignore_for_file: unnecessary_getters_setters
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+part 'imc.g.dart';
 
-class IMC {
+@HiveType(typeId: 1)
+class IMC extends HiveObject {
+  @HiveField(0)
   final String _id = UniqueKey().toString();
-  DateTime nascimento;
+  @HiveField(1)
+  DateTime dataCalculo;
+  @HiveField(2)
   double _altura;
+  @HiveField(3)
   double _peso;
 
-  IMC(this.nascimento, this._altura, this._peso);
+  IMC(this.dataCalculo, this._altura, this._peso);
 
   double imc() => _peso / ((_altura / 100) * (_altura / 100));
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 import 'utils/bmi_rate.dart';
@@ -13,6 +14,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var dir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(dir.path);
+  Hive.registerAdapter(IMCAdapter());
   runApp(const MyApp());
 }
 
@@ -47,7 +49,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late HeightRepository heightRepository;
   int _currentValue = 170;
-  var imcRepository = IMCRepository();
+  late IMCRepository imcRepository;
   List<IMC> imcHistory = [];
 
   var pesoController = TextEditingController(text: "");
@@ -55,12 +57,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    imcHistory = imcRepository.imcHistory;
     loadData();
   }
 
   loadData() async {
     heightRepository = await HeightRepository.init();
+    imcRepository = await IMCRepository.init();
+    imcHistory = imcRepository.imcHistory;
     _currentValue = heightRepository.height;
 
     setState(() {});
@@ -145,11 +148,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide.none,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(0),
                       ),
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide.none,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(0),
                       ),
                     ),
                   ),
@@ -179,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           _currentValue.toDouble(),
                           double.parse(pesoController.text),
                         );
-                        imcRepository.addIMC(imc);
+                        imcRepository.add(imc);
                         pesoController.text = "";
                         FocusManager.instance.primaryFocus?.unfocus();
                       }
@@ -190,7 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       shape: MaterialStateProperty.all(
                         RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(0),
                         ),
                       ),
                     ),
@@ -205,7 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 const Spacer(),
-                imcHistory.isEmpty
+                imcRepository.imcHistory.isEmpty
                     ? Container()
                     : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,10 +229,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Container(
                             margin: const EdgeInsets.only(bottom: 40),
-                            height: 150,
+                            height: 200,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: imcHistory.length,
+                              itemCount: imcRepository.imcHistory.length,
                               itemBuilder: _buildItem,
                             ),
                           ),
@@ -245,36 +248,116 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget? _buildItem(BuildContext context, int index) {
     return Card(
-      color: getBMIType(imcHistory[imcHistory.length - 1 - index].imc()).color,
+      color: getBMIType(imcRepository
+              .imcHistory[imcRepository.imcHistory.length - 1 - index]
+              .imc())
+          .color,
       elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0),
+      ),
       margin: EdgeInsets.only(left: index == 0 ? 20 : 0, right: 20),
       child: Container(
-        width: 120,
-        padding: const EdgeInsets.all(20),
+        width: 150,
+        padding: const EdgeInsets.all(25),
+        alignment: Alignment.topLeft,
         child: Column(
           children: [
-            Text(
-              imcHistory[imcHistory.length - 1 - index]
-                  .imc()
-                  .toStringAsFixed(1),
-              style: GoogleFonts.montserrat(
-                fontSize: 32,
-                fontWeight: FontWeight.w700,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "IMC",
+                      style: GoogleFonts.montserrat(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      imcRepository.imcHistory[
+                              imcRepository.imcHistory.length - 1 - index]
+                          .imc()
+                          .toStringAsFixed(1),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  DateFormat('dd/MM/yyyy').format(imcRepository
+                      .imcHistory[imcRepository.imcHistory.length - 1 - index]
+                      .dataCalculo),
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF777777),
+                    fontStyle: FontStyle.italic,
+                    height: 1,
+                  ),
+                ),
+              ],
             ),
-            Text(
-              "${imcHistory[imcHistory.length - 1 - index].altura.toStringAsFixed(0)}cm",
-              style: GoogleFonts.montserrat(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              "${imcHistory[imcHistory.length - 1 - index].peso.toStringAsFixed(0)}kg",
-              style: GoogleFonts.montserrat(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+            const Spacer(),
+            Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      imcRepository
+                          .imcHistory[
+                              imcRepository.imcHistory.length - 1 - index]
+                          .altura
+                          .toStringAsFixed(0),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 32,
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 8, left: 4),
+                      child: Text(
+                        "cm",
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF777777),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      imcRepository
+                          .imcHistory[
+                              imcRepository.imcHistory.length - 1 - index]
+                          .peso
+                          .toStringAsFixed(0),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 32,
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 8, left: 4),
+                      child: Text(
+                        "kg",
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF777777),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),

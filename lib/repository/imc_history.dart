@@ -1,24 +1,26 @@
+import 'package:hive/hive.dart';
 import 'package:imc/model/imc.dart';
 
 class IMCRepository {
-  final List<IMC> _imcHistory = [];
+  static late Box _box;
 
-  List<IMC> get imcHistory => _imcHistory;
+  IMCRepository._();
 
-  addIMC(IMC imc) {
-    _imcHistory.add(imc);
+  static Future<IMCRepository> init() async {
+    _box = Hive.isBoxOpen('imc_history')
+        ? Hive.box('imc_history')
+        : await Hive.openBox('imc_history');
+
+    return IMCRepository._();
   }
 
-  removeIMC(IMC imc) {
-    _imcHistory.remove(imc);
-  }
+  List<IMC> get imcHistory => _box.values.toList().cast<IMC>();
 
-  removeAll() {
-    _imcHistory.clear();
-  }
+  void add(IMC imc) => _box.add(imc);
 
-  updateIMC(IMC imc) {
-    var index = _imcHistory.indexWhere((element) => element.id == imc.id);
-    _imcHistory[index] = imc;
-  }
+  void delete(IMC imc) => _box.delete(imc.key);
+
+  void update(IMC imc) => _box.put(imc.key, imc);
+
+  void clear() => _box.clear();
 }
