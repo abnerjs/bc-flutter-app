@@ -208,7 +208,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 const Spacer(),
-                imcRepository.imcHistory.isEmpty
+                Hive.isBoxOpen('imc_history') &&
+                        imcRepository.imcHistory.isEmpty
                     ? Container()
                     : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,7 +233,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             height: 200,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: imcRepository.imcHistory.length,
+                              itemCount: Hive.isBoxOpen('imc_history')
+                                  ? imcRepository.imcHistory.length
+                                  : 0,
                               itemBuilder: _buildItem,
                             ),
                           ),
