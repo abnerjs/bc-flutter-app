@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:imc/utils/bmi_rate.dart';
+import 'package:hive/hive.dart';
 import 'package:numberpicker/numberpicker.dart';
 
+import 'utils/bmi_rate.dart';
 import 'model/imc.dart';
 import 'repository/imc_history.dart';
+import 'repository/height.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  var dir = await path_provider.getApplicationDocumentsDirectory();
+  Hive.init(dir.path);
   runApp(const MyApp());
 }
 
@@ -39,6 +45,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late HeightRepository heightRepository;
   int _currentValue = 170;
   var imcRepository = IMCRepository();
   List<IMC> imcHistory = [];
@@ -49,6 +56,14 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     imcHistory = imcRepository.imcHistory;
+    loadData();
+  }
+
+  loadData() async {
+    heightRepository = await HeightRepository.init();
+    _currentValue = heightRepository.height;
+
+    setState(() {});
   }
 
   @override
@@ -106,6 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   onChanged: (value) {
                     setState(() {
                       _currentValue = value;
+                      heightRepository.height = value;
                     });
                   },
                 ),
@@ -117,6 +133,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     keyboardType: TextInputType.datetime,
                     cursorColor: const Color(0xFF777777),
                     decoration: InputDecoration(
+                      floatingLabelStyle: GoogleFonts.montserrat(
+                        color: const Color(0xFF000000),
+                        height: 0.1,
+                      ),
                       filled: true,
                       fillColor: const Color(0xFFDDDDDD),
                       labelText: 'Peso em quilogramas',
