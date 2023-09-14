@@ -258,7 +258,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       margin: EdgeInsets.only(left: index == 0 ? 20 : 0, right: 20),
       child: Container(
-        width: 150,
+        width: 160,
         padding: const EdgeInsets.all(25),
         alignment: Alignment.topLeft,
         child: Column(
